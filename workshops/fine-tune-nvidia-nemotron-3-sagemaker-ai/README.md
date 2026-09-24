@@ -25,12 +25,12 @@ Customize the 30B-A3B model without selecting or managing training instances. Th
 
 **Model:** NVIDIA Nemotron 3 Nano 30B-A3B BF16 | **Dataset:** ContractNLI | **Training:** SageMaker serverless `SFTTrainer` with LoRA
 
-| Step | Notebook | Description |
-| ---- | -------- | ----------- |
-| 1 | [1-prepare-data.ipynb](01-serverless-workshop/1-prepare-data.ipynb) | Create string-valued prompt/completion training records and query/response test records, upload to S3, and register datasets in AI Registry. |
-| 2 | [2-fine-tune-llm.ipynb](01-serverless-workshop/2-fine-tune-llm.ipynb) | Run serverless LoRA SFT and associate the result with a Model Package Group. |
-| 3 | [3-evaluation.ipynb](01-serverless-workshop/3-evaluation.ipynb) | Compare base and fine-tuned models with a custom scorer, run a Bedrock frontier baseline, and evaluate with LLM-as-a-Judge. |
-| 4 | [4-deployment.ipynb](01-serverless-workshop/4-deployment.ipynb) | Deploy merged weights from the model package using vLLM and an Inference Component, test streaming inference, and clean up. |
+| Step | Notebook                                                              | Description                                                                                                                                  |
+| ---- | --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1    | [1-prepare-data.ipynb](01-serverless-workshop/1-prepare-data.ipynb)   | Create string-valued prompt/completion training records and query/response test records, upload to S3, and register datasets in AI Registry. |
+| 2    | [2-fine-tune-llm.ipynb](01-serverless-workshop/2-fine-tune-llm.ipynb) | Run serverless LoRA SFT and associate the result with a Model Package Group.                                                                 |
+| 3    | [3-evaluation.ipynb](01-serverless-workshop/3-evaluation.ipynb)       | Compare base and fine-tuned models with a custom scorer, run a Bedrock frontier baseline, and evaluate with LLM-as-a-Judge.                  |
+| 4    | [4-deployment.ipynb](01-serverless-workshop/4-deployment.ipynb)       | Deploy merged weights from the model package using vLLM and an Inference Component, test streaming inference, and clean up.                  |
 
 **Current notebook settings:** JumpStart model ID `huggingface-reasoning-nvidia-nemotron-3-nano-30b-a3b-bf16`, 10 training epochs, LoRA rank 32, and learning rate `1e-4`. Hosting uses one `ml.g5.12xlarge` with four GPUs and the vLLM `0.22.0` container.
 
@@ -44,21 +44,21 @@ Customize the 4B model using `ModelTrainer`, S3 input channels, and a training s
 
 **Model:** `nvidia/NVIDIA-Nemotron-3-Nano-4B-BF16` | **Dataset:** ContractNLI | **Training:** SageMaker Training jobs with BF16 LoRA, not QLoRA
 
-| Step | Notebook | Description |
-| ---- | -------- | ----------- |
-| 1 | [1-prepare-data.ipynb](02-smtj-workshop/1-prepare-data.ipynb) | Build chat-based prompt/completion records with `enable_thinking=False`, upload train/validation splits to S3, and retain test records locally. |
-| 2 | [2-fine-tune-llm.ipynb](02-smtj-workshop/2-fine-tune-llm.ipynb) | Generate the training recipe, launch `scripts/train.py` with `ModelTrainer`, and save merged weights to S3. |
-| 3 | [3-deployment.ipynb](02-smtj-workshop/3-deployment.ipynb) | Discover a completed Training job, deploy its merged artifact directly with vLLM, and check a response. The endpoint stays up for notebook 4. |
-| 4 | [4-evaluation.ipynb](02-smtj-workshop/4-evaluation.ipynb) | Score the endpoint over the 123 held-out contracts with the custom scorer, compare against the untuned model and a frontier baseline, run LLM-as-a-Judge as a managed Bedrock evaluation job, then delete the endpoint. |
+| Step | Notebook                                                        | Description                                                                                                                                                                                                             |
+| ---- | --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1    | [1-prepare-data.ipynb](02-smtj-workshop/1-prepare-data.ipynb)   | Build chat-based prompt/completion records with `enable_thinking=False`, upload train/validation splits to S3, and retain test records locally.                                                                         |
+| 2    | [2-fine-tune-llm.ipynb](02-smtj-workshop/2-fine-tune-llm.ipynb) | Generate the training recipe, launch `scripts/train.py` with `ModelTrainer`, and save merged weights to S3.                                                                                                             |
+| 3    | [3-deployment.ipynb](02-smtj-workshop/3-deployment.ipynb)       | Discover a completed Training job, deploy its merged artifact directly with vLLM, and check a response. The endpoint stays up for notebook 4.                                                                           |
+| 4    | [4-evaluation.ipynb](02-smtj-workshop/4-evaluation.ipynb)       | Score the endpoint over the 123 held-out contracts with the custom scorer, compare against the untuned model and a frontier baseline, run LLM-as-a-Judge as a managed Bedrock evaluation job, then delete the endpoint. |
 
 Deployment comes before evaluation in this track because evaluation scores the endpoint. Both are
 gated by switches that default to reading pre-computed results from `02-smtj-workshop/baselines/`,
 so the notebook can be read without running anything:
 
-| Switch | `False` (default) | `True` | Time when `True` |
-| ------ | ----------------- | ------ | ---------------- |
-| `RUN_ENDPOINT_EVAL` | reads pre-computed results | scores all 123 contracts against your endpoint | ~3 min |
-| `RUN_JUDGE_EVAL` | reads pre-computed results | runs two Bedrock judge jobs over 30 contracts | ~20 min |
+| Switch              | `False` (default)          | `True`                                         | Time when `True` |
+| ------------------- | -------------------------- | ---------------------------------------------- | ---------------- |
+| `RUN_ENDPOINT_EVAL` | reads pre-computed results | scores all 123 contracts against your endpoint | ~3 min           |
+| `RUN_JUDGE_EVAL`    | reads pre-computed results | runs two Bedrock judge jobs over 30 contracts  | ~20 min          |
 
 The judge reaches Bedrock directly rather than through `LLMAsJudgeEvaluator`, because this track
 registers no Model Package. The endpoint's answers are supplied to the evaluation job as
